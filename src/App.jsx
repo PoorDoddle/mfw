@@ -25,7 +25,7 @@ function App() {
       }
     };
     fetchMuscles();
-  });
+  }, []);
   return <>{data && <SearchBar data={data} />}</>;
 }
 

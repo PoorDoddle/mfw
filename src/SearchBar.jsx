@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./SearchBar.css";
 import { v4 } from "uuid";
+import { jsx } from "react/jsx-runtime";
 export default function SearchBar({ data }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [exercise, setExercise] = useState([]);
   const [isSearch, setIsSearch] = useState(true);
-
+  const upData = data.filter((d) => {
+    if (searchTerm == "") {
+      return d;
+    } else if (d.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return d.name;
+    }
+  });
+  const dUpData = upData.filter((item, idx) => idx < 9);
   const handleClick = (d) => {
     //setIsSearch(false);
 
@@ -21,6 +29,15 @@ export default function SearchBar({ data }) {
       return prevEx.filter((_, i) => i !== index);
     });
   };
+  useEffect(() => {
+    const exData = window.localStorage.getItem("EXERCISE_LIST");
+    {
+      exData && setExercise(JSON.parse(exData));
+    }
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem("EXERCISE_LIST", JSON.stringify(exercise));
+  }, [exercise]);
   return (
     <div className="flex justify-center">
       <div className="flex justify-center items-center flex-col w-1/3 h-full mt-4">
@@ -34,31 +51,20 @@ export default function SearchBar({ data }) {
         />
 
         {isSearch &&
-          data
-            .filter((d) => {
-              if (searchTerm == "") {
-                return d;
-              } else if (
-                d.name.toLowerCase().includes(searchTerm.toLowerCase())
-              ) {
-                return d.name;
-              }
-            })
-            .filter((item, idx) => idx < 9)
-            .map((d) => {
-              return (
-                <div
-                  key={v4()}
-                  id={v4()}
-                  onClick={() => {
-                    handleClick(d.name);
-                  }}
-                  className="border-2 border-solid rounded-lg border-cyan-400 w-full cursor-pointer h-15"
-                >
-                  <h3 className="cursor-pointer m-4">{d.name}</h3>
-                </div>
-              );
-            })}
+          dUpData.map((d) => {
+            return (
+              <div
+                key={v4()}
+                id={v4()}
+                onClick={() => {
+                  handleClick(d.name);
+                }}
+                className="border-2 border-solid rounded-lg border-cyan-400 w-full cursor-pointer h-15"
+              >
+                <h3 className="cursor-pointer m-4">{d.name}</h3>
+              </div>
+            );
+          })}
       </div>
       <div className="flex">
         <ul className="mt-4">
